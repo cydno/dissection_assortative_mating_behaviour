@@ -4,12 +4,13 @@ Richard M. Merrill, Pasi Rastas, Maria C. Melo, Sarah Barker, John Davey, W. Owe
 
 This repository documents analyses for the manuscript "Genetic dissection of assortative mating behaviour". These bespoke scripts are presented for transparency only and will require editing to be applied to other datasets. 
 
-The repository includes 4 main directories.: 
-1) `phasing`, which includes scripts used to phase genotypes etc. 
+The repository includes : 
 
-2) `raw_data`, which includes: 
+a) Scripts by Pasi Rastas for phasing data etc - contained within `scripts.zip`, detailed below (1)
 
-`complete_preference_data.csv` = which include courtship data for all 292 males included in the study. This is included for reference only and is not called by any script.
+b) Raw data for QTL analysis, including: 
+
+`complete_preference_data.csv` = which includes courtship data for all 292 males included in the study. This is included for reference only and is not called by any script.
 
 `data_for_Rqtl.csv` = phenotype and genotype data for males with RADseq genotypes in R/qtl format
 
@@ -17,10 +18,18 @@ The repository includes 4 main directories.:
 
 `species_brood_data.csv` = phenotype data for parental species, F1 hybrids and backcross hybrids towards both species, but only includes individuals which performed courtships at least once.
 
-3) `anal_code`, which include the major scipts used for analysis of qtl data. 
+c) Scripts for QTL and associated analysis by Richard Merrill, detailed below (2)
 
-4) `derived_data`, which includes files with results and data generated from the scripts included within `anal_code`.
-
+```
+1_genome_scan.R
+2_permutations_courtship_prop.R
+2_permutations_trial_prop.R
+3_qtl_significance.R
+4_effect_size.R
+5_QTL1_sims.R
+5_QTL17_sims.R
+5_QTL18_sims.R
+```
 
 ### 1) Scripts by Pasi Rastas to phase genotype data for each family and chromosome
 
@@ -90,7 +99,7 @@ done
 
 final output, map[1-21]_masked.txt
 
-### 2) Scripts by Richard Merrill for QTL analyses within `anal_code`:
+### 2) Scripts by Richard Merrill for QTL analyses:
 
 ### i) Genome-wide QTL scan
 
@@ -98,7 +107,7 @@ final output, map[1-21]_masked.txt
 Rscript 1_genome_scan.R
 ```
 
-R script to run a binomial GLMM at each genetic (cM) position across the genome (i.e. cydno x melpomene linkage map). GLMM includes id as an individual level random factor to account for overdispersion (see for example, Elston et al 2001, Parasitology). In addition, runs a non-parametric QTL analysis using R/qtl (using function scanone with model = "np"). Requires phenotype and genotype data for backcross hybrids in R/qtl format:  `raw_data/data_for_Rqtl.csv`. Produces lod scores across the genome: `derived_data/genome_scan_lod_score.csv`; and summary of qtl peaks:  `derived_data/qtl_summary`
+R script to run a binomial GLMM at each genetic (cM) position across the genome (i.e. cydno x melpomene linkage map). GLMM includes id as an individual level random factor to account for overdispersion (see for example, Elston et al 2001, Parasitology). In addition, runs a non-parametric QTL analysis using R/qtl (using function scanone with model = "np"). Requires phenotype and genotype data for backcross hybrids in R/qtl format:  `data_for_Rqtl.csv`. Produces lod scores across the genome: `genome_scan_lod_score.csv`; and summary of qtl peaks:  `qtl_summary`
 
 
 ### ii) Permutations to determine genome-wide-significance 
@@ -108,7 +117,7 @@ Rscript 2_permutations_courtship_prop.R -20
 Rscript 2_permutations_trial_prop.R -20
 ```
 
-Scripts to run permutations used to determine genome-wide-significance: First (`2_permutations_courtship_prop.R`) for the proportion of courtships directed towards H. melpomene females; and second (`2_permutations_trial_prop.R`) for the proportion of trials in which courtship was initiated towards either a) H. melpomene, or b) H. cydno. Permeates phenotype data over genotypes (and covariates) to provide null distribution of lod scores, i.e. correcting for multiple tests across genome. This is best run over multiple threads (here = 20) as it will take a very long time. Requires phenotype and genotype data for backcross hybrids in R/qtl format:  `raw_data/data_for_Rqtl.csv`. Produces distribution of lod scores: `derived_data/permutations_courtship_prop.csv` and `derived_data/permutations_trial_prop.csv`.
+Scripts to run permutations used to determine genome-wide-significance: First (`2_permutations_courtship_prop.R`) for the proportion of courtships directed towards H. melpomene females; and second (`2_permutations_trial_prop.R`) for the proportion of trials in which courtship was initiated towards either a) H. melpomene, or b) H. cydno. Permeates phenotype data over genotypes (and covariates) to provide null distribution of lod scores, i.e. correcting for multiple tests across genome. This is best run over multiple threads (here = 20) as it will take a very long time. Requires phenotype and genotype data for backcross hybrids in R/qtl format:  `data_for_Rqtl.csv`. Produces distribution of lod scores: `permutations_courtship_prop.csv` and `permutations_trial_prop.csv`.
 
 
 
@@ -119,7 +128,7 @@ Scripts to run permutations used to determine genome-wide-significance: First (`
 Rscript 3_qtl_significance.R 
 ```
 
-Script to determine significance of individual qtl, using the null distribution of lod scores  generated above through permutation. Also builds a GLMM of the proportion of courtships towards H. melpomene with qtl on chr 1, 17 18 as explanatory factors. Tests whether to retain each qtl in a multiple-qtl model using a) likelihood ratio tests and b) a (very conservative) penalised lod score approach (see Browman and Sen 2009). Requires phenotype and genotype data for backcross hybrids in R/qtl format:  `raw_data/data_for_Rqtl.csv`. Produces table of qtl thresholds for GLMM analyses: `derived_data/permutations_trial_prop.csv`; and determines P-values from permutations which are added to the qtl summary: `derived_data/qtl_summary`. Produces `derived_data/qtl_data.csv`, which is used below.
+Script to determine significance of individual qtl, using the null distribution of lod scores  generated above through permutation. Also builds a GLMM of the proportion of courtships towards H. melpomene with qtl on chr 1, 17 18 as explanatory factors. Tests whether to retain each qtl in a multiple-qtl model using a) likelihood ratio tests and b) a (very conservative) penalised lod score approach (see Browman and Sen 2009). Requires phenotype and genotype data for backcross hybrids in R/qtl format:  `raw_data/data_for_Rqtl.csv`. Produces table of qtl thresholds for GLMM analyses: `permutations_trial_prop.csv`; and determines P-values from permutations which are added to the qtl summary: `qtl_summary`. Produces `qtl_data.csv`, which is used below.
 
 
 ### iv) Determine effect sizes of qtl
@@ -128,7 +137,7 @@ Script to determine significance of individual qtl, using the null distribution 
 Rscript 4_effect_size.R 
 ```
 
-Script to determines effect sizes from GLMMs (measured as the proportion of the parental difference) and associated 95% confidence intervals (for figures 2 and 3b). Does this for qtl on chromosomes 1, 17 and 18, as well as for individuals without rad-seq data (but with known phenotype). Requires: `derived_data/qtl_data.csv` generated in `3_qtl_significance.R`; data for hybrids without rad sequence data: `raw_data/IDs_with_pheno_no_RAD.csv`; data for parental species (includes data for parentals, as well as F1 and backcross hybrids): `raw_data/species_brood_data.csv`; and, the qtl summary: `derived_data/qtl_summary.csv`.
+Script to determines effect sizes from GLMMs (measured as the proportion of the parental difference) and associated 95% confidence intervals (for figures 2 and 3b). Does this for qtl on chromosomes 1, 17 and 18, as well as for individuals without rad-seq data (but with known phenotype). Requires: `qtl_data.csv` generated in `3_qtl_significance.R`; data for hybrids without rad sequence data: `IDs_with_pheno_no_RAD.csv`; data for parental species (includes data for parentals, as well as F1 and backcross hybrids): `species_brood_data.csv`; and, the qtl summary: `qtl_summary.csv`.
 
 
 ### v) Estimate Beavis effect through simulation
@@ -139,4 +148,4 @@ Rscript 5_QTL17_sims.R
 Rscript 5_QTL18_sims.R
 ```
 
-Script to runs simulation (for each qtl) to determine the extent to which the effects of our QTL may be over-estimated due to the Beavis effect. Takes a long time to run. Requires `derived_data/qtl_data.csv` generated by `4_qtl_significance.R`. Produces: `QTL_1_sim_results.csv` etc. Note that the distribution of 'significant' simulations excludes runs in which the GLMM did not converge.
+Script to runs simulation (for each qtl) to determine the extent to which the effects of our QTL may be over-estimated due to the Beavis effect. Takes a long time to run. Requires `qtl_data.csv` generated by `4_qtl_significance.R`. Produces: `QTL_1_sim_results.csv` etc. Note that the distribution of 'significant' simulations excludes runs in which the GLMM did not converge.
