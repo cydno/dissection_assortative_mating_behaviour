@@ -31,6 +31,20 @@ c) Scripts for QTL and associated analysis by Richard Merrill, detailed below (2
 5_QTL18_sims.R
 ```
 
+d) Dervived data files for QTL and associated analysis by Richard Merrill, detailed below (2)
+
+```
+genome_scan_lod_score.csv
+genome_wide_thresholds.csv
+permutations_courtship_prop.csv
+permutations_trial_prop.csv
+QTL_1_sim_results.csv
+QTL_17_sim_results.csv
+QTL_18_sim_results.csv
+qtl_data.csv
+qtl_summary.csv
+```
+
 ### 1) Scripts by Pasi Rastas to phase genotype data for each family and chromosome
 
 scripts contained in `anal_code/phasing`
